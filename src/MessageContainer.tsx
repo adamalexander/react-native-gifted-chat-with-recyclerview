@@ -16,6 +16,8 @@ import {
   Platform,
 } from 'react-native'
 
+import {RecyclerView,DataSource} from 'react-native-android-recyclerview';
+
 import { LoadEarlier, LoadEarlierProps } from './LoadEarlier'
 import Message from './Message'
 import Color from './Color'
@@ -335,7 +337,52 @@ export default class MessageContainer<
 
   render() {
     const { inverted } = this.props
-    return (
+    if (Platform.OS === 'android') {
+      console.log("edited baby")
+            return (<View style={this.props.alignTop ? styles.containerAlignTop : styles.container}>
+                {this.state.showScrollBottom && this.props.scrollToBottom
+                    ? this.renderScrollToBottomWrapper()
+                    : null}
+                <RecyclerView
+                    ref={this.props.forwardRef}
+                    style={styles.listStyle}
+                    dataSource={this.props.messages}
+                    renderItem={this.renderRow}
+                    windowSize={80}
+                    initialScrollIndex={0}
+                    inverted={inverted}
+                    column={1}
+                    contentContainerStyle={styles.contentContainerStyle}
+                    {...this.props.invertibleScrollViewProps}
+                    ListEmptyComponent={this.renderChatEmpty} 
+                    ListFooterComponent={inverted ? this.renderHeaderWrapper : this.renderFooter} 
+                    ListHeaderComponent={inverted ? this.renderFooter : this.renderHeaderWrapper} 
+                    scrollEventThrottle={100} 
+                    onLayout={this.onLayoutList} 
+                    onEndReached={this.onEndReached} 
+                    onEndReachedThreshold={0.1} 
+                    {...this.props.listViewProps}
+
+                    onScrollBeginDrag={(event)=>{
+                        console.log('onScrollBeginDrag')
+                    }}
+                    onScroll={this.handleOnScroll}
+                    onScrollEndDrag={(event)=>{
+                        console.log('onScrollEndDrag')
+                    }}
+                    onContentSizeChange={(event)=>{
+                        console.log('onContentSizeChange')
+                    }}
+                    onVisibleItemsChange={(event)=>{
+                        console.log('onVisibleItemsChange')
+                    }}
+                    ItemSeparatorComponent={(
+                        <View style={{ borderBottomWidth: 1, borderColor: 'transparent', marginHorizontal: 0, marginVertical: 6 }} />
+                    )} 
+                />
+              </View>);
+    }else{
+      return (
       <View
         style={
           this.props.alignTop ? styles.containerAlignTop : styles.container
@@ -372,5 +419,6 @@ export default class MessageContainer<
         />
       </View>
     )
+    }
   }
 }
